@@ -9,8 +9,9 @@ library(MMRFBiolinks)
 # Fictitious data can be loaded by using clinMMGateway <- get(load("mmrf_case2.rda")). 
 
 # IMPORTANT 1! If you want to generalize the the case study 2, you would need to download data from MMRF Researcher Gateway (RG) and 
-# import them into your R workspace for feeding the following Workflow. In addition,  you would need to comment listSamples and get(load("mmrf_case2.rda")), 
-# replace mmrf_case2.rda with with downloaded data from MMRF Researcher Gateway (RG) and eventually replace listSamples with your chosen filtering list of samples.
+# import them into your R workspace for feeding the following Workflow.
+# Before feeding the workflow with downloaded data, you would need to comment listSamples and get(load("mmrf_case2.rda")), 
+# replace mmrf_case2.rda with with downloaded data and eventually replace listSamples with your chosen filtering list of samples.
 # At the time of this script, the response-treatment file name to download from MMRF Researcher Gateway (RG) 
 # is "MMRF_CoMMpass_IA14_STAND_ALONE_TRTRESP.csv".
 
