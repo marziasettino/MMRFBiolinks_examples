@@ -9,13 +9,13 @@ library(MMRFBiolinks)
 clin.mm<-MMRFqueryGDC_clinic(type = "clinical")
 
 # grouping samples by therapy
-bor.sample<-MMRFgetGDC_BarcodeTherapy("Bortezomib",clin.mm)
+bor.samples<-MMRFgetGDC_BarcodeTherapy("Bortezomib",clin.mm)
 dexa.samples<- MMRFgetGDC_BarcodeTherapy("Dexamethasone",clin.mm)
 
 #subsetting samples groups to make faster the run
 
-bor.samples<-bor.sample[1:10]
-dexa.samples<-dexa.samples[1:10]
+bor.samples<-bor.samples[1:8]
+dexa.samples<-dexa.samples[1:8]
 
 # selecting for each group the samples that not are included in the other group
 
@@ -48,28 +48,32 @@ MMRFdata.prep <- MMRFGDC_prepare(query.mm,
 
 
 MMRFdataPrepro <- MMRFanalyzeGDC_Preprocessing(object = MMRFdata.prep,
-                                               cor.cut = 0.6,
+                                               cor.cut = 0,
                                                datatype = "HTSeq - FPKM",
                                                filename ="MMRF_Preprocessing.png")
 
-MMRFdataPrepro.log <- log2(MMRFdataPrepro)
+
 
 # extract the substring of the sample identifier in MMRFdataPrepro.log that map with sample identifier in clin.mm
-colnames(MMRFdataPrepro.log) <- substr(colnames(MMRFdataPrepro.log),1,9)
 
-G_list<-rownames(MMRFdataPrepro.log)
+colnames(MMRFdataPrepro) <- substr(colnames(MMRFdataPrepro),1,9)
+
+
+G_list<-rownames(MMRFdataPrepro)
 
 # subset of genes list to make faster the run
-G_list<-G_list[1:30]
+G_list<-G_list[1:100]
 
 
 
-gr1<-bor.samples[bor.samples %in% colnames(MMRFdataPrepro.log)]
-gr2<-dexa.samples[dexa.samples %in% colnames(MMRFdataPrepro.log)]
+
+
+gr1<-bor.samples[bor.samples %in% colnames(MMRFdataPrepro)]
+gr2<-dexa.samples[dexa.samples %in% colnames(MMRFdataPrepro)]
 
 
 tabSurvKM <- MMRFanalyzeGDC_SurvivalKM(clin.mm,
-                                       MMRFdataPrepro.log,
+                                      MMRFdataPrepro,
                                        Genelist = G_list,
                                        Survresult = TRUE,
                                        p.cut = 0.6,
@@ -84,3 +88,6 @@ tabSurvKM <- tabSurvKM[order(tabSurvKM$pvalue, decreasing=F),]
 
 col.names <- c("pvalue","Group1 Deaths","Group1 Deaths with Top","Group1 Deaths with Down", "Mean Group1 Top", "Mean Group1 Down","Mean Group2")
 colnames(tabSurvKM) <- col.names
+
+tabSurvKM<-tabSurvKM[1:10,]
+
