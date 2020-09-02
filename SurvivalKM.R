@@ -47,10 +47,18 @@ MMRFdata.prep <- MMRFGDC_prepare(query.mm,
                                  summarizedExperiment = TRUE)
 
 
-MMRFdataPrepro <- MMRFanalyzeGDC_Preprocessing(object = MMRFdata.prep,
-                                               cor.cut = 0,
-                                               datatype = "HTSeq - FPKM",
-                                               filename ="MMRF_Preprocessing.png")
+#MMRFdataPrepro <- MMRFanalyzeGDC_Preprocessing(object = MMRFdata.prep,
+                                            #   cor.cut = 0,
+                                             #  datatype = "HTSeq - FPKM",
+                                             #  filename ="MMRF_Preprocessing.png")
+
+
+
+MMRFdataPrepro <- TCGAanalyze_Preprocessing(object = MMRFdata.prep,
+                                            cor.cut = 0,
+                                            datatype = "HTSeq - FPKM",
+                                            filename ="MMRF_Preprocessing.png")
+
 
 
 
