@@ -42,22 +42,19 @@ GDCdownload(query.mm)
 
 MMRFdata.prep <- MMRFGDC_prepare(query.mm,
                                  save = TRUE ,
-                                 save.filename = "RNASeqSE.rda" ,
+                                 save.filename = "data/RNASeqSE.rda" ,
                                  directory = "GDCdata",
                                  summarizedExperiment = TRUE)
 
 
-#MMRFdataPrepro <- MMRFanalyzeGDC_Preprocessing(object = MMRFdata.prep,
-                                            #   cor.cut = 0,
-                                             #  datatype = "HTSeq - FPKM",
-                                             #  filename ="MMRF_Preprocessing.png")
+
 
 
 
 MMRFdataPrepro <- TCGAanalyze_Preprocessing(object = MMRFdata.prep,
                                             cor.cut = 0,
                                             datatype = "HTSeq - FPKM",
-                                            filename ="MMRF_Preprocessing.png")
+                                            filename ="img/MMRF_Preprocessing.png")
 
 
 
@@ -98,4 +95,8 @@ col.names <- c("pvalue","Group1 Deaths","Group1 Deaths with Top","Group1 Deaths 
 colnames(tabSurvKM) <- col.names
 
 tabSurvKM<-tabSurvKM[1:10,]
+
+tabSurvKM %>% datatable(options = list(scrollX = TRUE, keys = TRUE))
+
+datatable(tabSurvKM)
 

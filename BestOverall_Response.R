@@ -5,15 +5,22 @@ library(DT)
 library(MMRFBiolinks)
 
 
-# IMPORTANT 1! Data used in this example script are fictitious because of registration required by MMRF Researcher Gateway (RG) for accessing data.
-# Fictitious data can be loaded by using clinMMGateway <- get(load("mmrf_case2.rda")). 
+# IMPORTANT 1! Data used in this example script are fictitious because of registration required by 
+# MMRF Researcher Gateway (RG) for accessing data.
+# Fictitious data can be loaded by using clinMMGateway <- get(load("clinMMGateway")). 
 
-# IMPORTANT 1! If you want to generalize the the case study 2, you would need to download data from MMRF Researcher Gateway (RG) and 
-# import them into your R workspace for feeding the following Workflow.
-# Before feeding the workflow with downloaded data, you would need to comment listSamples and get(load("mmrf_case2.rda")), 
-# replace mmrf_case2.rda with with downloaded data and eventually replace listSamples with your chosen filtering list of samples.
-# At the time of this script, the response-treatment file name to download from MMRF Researcher Gateway (RG) 
+
+# IMPORTANT 1! If you want to reproduce the case study 2 by using complete MMRF Researcher Gateway (RG) clinical data, 
+#you would need to download data from MMRF Researcher Gateway (RG) and import them into your R environmnet for feeding the following Workflow.
+# Before feeding the workflow with downloaded data, you would need to comment <get(load("data/clinMMGateway.rda"))>, replace <listSamples> with
+# your list of samples. Once this is done, you would can import downloaded data into R environmnet for using them instead of 
+#<clinMMGateway>.
+
+
+# Note1:at the time of this script, the response-treatment file name to download from MMRF Researcher Gateway (RG) 
 # is "MMRF_CoMMpass_IA14_STAND_ALONE_TRTRESP.csv".
+
+#Note2: pay attention to import MMRF-RG dataset into R environment including the heading of columns.
 
 
 
@@ -22,11 +29,14 @@ listSamples <- c("MMRF_0001","MMRF_0002",
                  "MMRF_0003","MMRF_0004",
                  "MMRF_0005","MMRF_0006",
                  "MMRF_0007","MMRF_0008",
-                 "MMRF_0009","MMRF_0010")
+                 "MMRF_0009","MMRF_0010",
+                 "MMRF_0011","MMRF_0012",
+                 "MMRF_0013")
 
 
 
-clinMMGateway <- get(load("mmrf_case2.rda")) 
+
+clinMMGateway <- get(load("data/clinMMGateway.rda")) 
 
 #filter clinMMGateway by samples identifiers
 bestOveall<-MMRFgetGateway_BestOverallResponse(listSamples, clinMMGateway)
@@ -35,7 +45,19 @@ bestOveall<-MMRFgetGateway_BestOverallResponse(listSamples, clinMMGateway)
 
 # Draw plot of the Best Overall Response to the Treatment: only the subset of samples filtered by therapyname="Bortezomib" is considered.
 
-bestOveallPlot1<-MMRFgetGateway_BestOverallResponsePlot(clinMMGateway,"Bortezomib",height=5, width=8, filename = "BestOverallPlot1")
+bestOveallPlot1<-MMRFgetGateway_BestOverallResponsePlot(clinMMGateway,"Bortezomib",height=5, width=8, filename = "img/BestOverallPlot")
 
 #Draw plot of the Best Overall Response to the Treatment.
-bestOveallPlot2<-MMRFgetGateway_BestOverallResponsePlot(clinMMGateway,topN=40, height=15, width=15,filename = "BestOverallPlot2")
+bestOveallPlot2<-MMRFgetGateway_BestOverallResponsePlot(clinMMGateway,topN=40, height=15, width=15,filename = "img/BestOverallPlot_2")
+
+
+
+#Draw plot of Time (days) Vs the Best Overall Response
+MMRFgetGateway_TimeBestOverallResponsePlot(clinMMGateway,"Dexamethasone","days", filename="img/TimeBestOverall_responsePlot")
+
+
+
+#Draw plot of the Treatment duration (cycle)
+MMRFgetGateway_TrtdurationBO(clinMMGateway,"Bortezomib",ttime="cycles",bor="PR",filename="img/Trt_DurationPlot",height=10, width=10)
+
+
