@@ -43,16 +43,6 @@ bestOveall<-MMRFgetGateway_BOresponse(listSamples, clinMMGateway)
 
 
 
-
-#bar.dexa<-MMRFGetGDC_BarcodeTherapy("Dexamethasone",clin.mm)
-#MMRFGetGDC_Treatments(clin.mm)
-#bestOveallType<-MMRFGetGateway_BOresponseType(clinMMGateway,"PR" ) 
-#MMRFget_InfoCohort(query.mm)
-#MMRFget_NCasesCohort(query.mm)
-#Convert_toGeneSymbol(ensembl.genes)
-#Convert_toGeneEnsembl(symbol.gene)
-
-
 # Draw plot of the Best Overall Response to the Treatment: only the subset of samples filtered by therapyname="Bortezomib" is considered.
 
 bestOveallPlot1<-MMRFGetGateway_BOresponsePlot(clinMMGateway,"Bortezomib",height=5, width=8, filename = "img/BestOverallPlot")

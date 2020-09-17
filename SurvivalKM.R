@@ -9,13 +9,15 @@ library(MMRFBiolinks)
 clin.mm<-MMRFqueryGDC_clinic(type = "clinical")
 
 # grouping samples by therapy
-bor.samples<-MMRFgetGDC_BarcodeTherapy("Bortezomib",clin.mm)
-dexa.samples<- MMRFgetGDC_BarcodeTherapy("Dexamethasone",clin.mm)
+bor.samples<-MMRFGetGDC_IdentifierByTherapy("Bortezomib",clin.mm)
+dexa.samples<- MMRFGetGDC_IdentifierByTherapy("Dexamethasone",clin.mm)
+
+
 
 #subsetting samples groups to make faster the run
 
-bor.samples<-bor.samples[1:8]
-dexa.samples<-dexa.samples[1:8]
+bor.samples<-bor.samples[1:50]
+dexa.samples<-dexa.samples[1:50]
 
 # selecting for each group the samples that not are included in the other group
 
@@ -65,9 +67,13 @@ colnames(MMRFdataPrepro) <- substr(colnames(MMRFdataPrepro),1,9)
 
 
 G_list<-rownames(MMRFdataPrepro)
+symbol.gene <- ensembldb::select(EnsDb.Hsapiens.v79, keys= G_list, keytype = "GENEID", columns = c("SYMBOL","GENEID"))
+
+row.names(MMRFdataPrepro)<-symbol.gene$SYMBOL
+G_list<-symbol.gene$SYMBOL
 
 # subset of genes list to make faster the run
-G_list<-G_list[1:100]
+G_list<-G_list[1:200]
 
 
 
@@ -76,15 +82,27 @@ gr1<-bor.samples[bor.samples %in% colnames(MMRFdataPrepro)]
 gr2<-dexa.samples[dexa.samples %in% colnames(MMRFdataPrepro)]
 
 
+
+dataMMcomplete <- log2(MMRFdataPrepro[1:56457,] + 1)
+
 tabSurvKM <- MMRFanalyzeGDC_SurvivalKM(clin.mm,
-                                      MMRFdataPrepro,
+                                       dataMMcomplete,
                                        Genelist = G_list,
                                        Survresult = TRUE,
-                                       p.cut = 0.6,
+                                       p.cut = 0.05,
                                        ThreshTop = 0.67,
                                        ThreshDown = 0.33,
                                        group1=gr1, 
                                        group2=gr2)
+
+
+
+
+
+
+
+
+
 
 
 tabSurvKM <- tabSurvKM[order(tabSurvKM$pvalue, decreasing=F),]
@@ -93,8 +111,47 @@ tabSurvKM <- tabSurvKM[order(tabSurvKM$pvalue, decreasing=F),]
 col.names <- c("pvalue","Group1 Deaths","Group1 Deaths with Top","Group1 Deaths with Down", "Mean Group1 Top", "Mean Group1 Down","Mean Group2")
 colnames(tabSurvKM) <- col.names
 
-tabSurvKM<-tabSurvKM[1:10,]
+#tabSurvKM<-tabSurvKM[1:10,]
 
 
 datatable(tabSurvKM)
+
+#select the top two genes in tabSurvKM
+
+
+top.gene1<-rownames(tabSurvKM)[1]
+top.gene2<-rownames(tabSurvKM)[2]
+
+
+tabSurvKM.gene1 <- MMRFanalyzeGDC_SurvivalKM(clin.mm,
+                                       dataMMcomplete,
+                                       Genelist = top.gene1,
+                                       Survresult = TRUE,
+                                       p.cut = 0.05,
+                                       ThreshTop = 0.67,
+                                       ThreshDown = 0.33,
+                                       group1=gr1, 
+                                       group2=gr2)
+
+
+
+tabSurvKM.gene2 <- MMRFanalyzeGDC_SurvivalKM(clin.mm,
+                                             dataMMcomplete,
+                                             Genelist = top.gene2,
+                                             Survresult = TRUE,
+                                             p.cut = 0.05,
+                                             ThreshTop = 0.67,
+                                             ThreshDown = 0.33,
+                                             group1=gr1, 
+                                             group2=gr2)
+
+
+
+
+
+
+
+
+
+
 
