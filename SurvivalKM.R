@@ -72,7 +72,6 @@ G_list<-G_list[1:100]
 
 
 
-
 gr1<-bor.samples[bor.samples %in% colnames(MMRFdataPrepro)]
 gr2<-dexa.samples[dexa.samples %in% colnames(MMRFdataPrepro)]
 
@@ -96,7 +95,6 @@ colnames(tabSurvKM) <- col.names
 
 tabSurvKM<-tabSurvKM[1:10,]
 
-tabSurvKM %>% datatable(options = list(scrollX = TRUE, keys = TRUE))
 
 datatable(tabSurvKM)
 
