@@ -3,6 +3,13 @@ library(SummarizedExperiment)
 library(dplyr)
 library(DT)
 library(MMRFBiolinks)
+library(EnsDb.Hsapiens.v79)
+
+#Get MMRF-COMMPASS Project Summary
+
+summary<-MMRFgetProjectSummary()
+summary$data_categories
+summary$experimental_strategies
 
 
 #downloading clinical data
@@ -16,8 +23,8 @@ dexa.samples<- MMRFGetGDC_IdentifierByTherapy("Dexamethasone",clin.mm)
 
 #subsetting samples groups to make faster the run
 
-bor.samples<-bor.samples[1:50]
-dexa.samples<-dexa.samples[1:50]
+bor.samples<-bor.samples[1:15]
+dexa.samples<-dexa.samples[1:15]
 
 # selecting for each group the samples that not are included in the other group
 
@@ -27,7 +34,7 @@ dexa.samples<- dexa.samples[!dexa.samples %in% bor.samples]
 
 listSamples<-c(bor.samples,dexa.samples)
 
-query.mm <- GDCquery(project = "MMRF-COMMPASS", 
+query.fpkm <- GDCquery(project = "MMRF-COMMPASS", 
                      data.category = "Transcriptome Profiling",
                      data.type = "Gene Expression Quantification",
                      experimental.strategy = "RNA-Seq",
@@ -35,14 +42,20 @@ query.mm <- GDCquery(project = "MMRF-COMMPASS",
                      barcode = listSamples)
 
 
-#downloading samples
-GDCdownload(query.mm)
 
-# GDCdownload(query.mm, method = "api", files.per.chunk = 100)
+
+summary<-MMRFqueryGDC_Summary(query.fpkm)
+
+
+
+#downloading samples
+GDCdownload(query.fpkm)
+
+# GDCdownload(query.fpkm, method = "api", files.per.chunk = 100)
 
 # Prepare expression matrix with geneID in the rows and samples (barcode) in the columns
 
-MMRFdata.prep <- MMRFGDC_prepare(query.mm,
+MMRFdata.prep <- MMRFGDC_prepare(query.fpkm,
                                  save = TRUE ,
                                  save.filename = "data/RNASeqSE.rda" ,
                                  directory = "GDCdata",
@@ -56,14 +69,7 @@ MMRFdata.prep <- MMRFGDC_prepare(query.mm,
 MMRFdataPrepro <- TCGAanalyze_Preprocessing(object = MMRFdata.prep,
                                             cor.cut = 0,
                                             datatype = "HTSeq - FPKM",
-                                            filename ="img/MMRF_Preprocessing.png")
-
-
-
-
-# extract the substring of the sample identifier in MMRFdataPrepro.log that map with sample identifier in clin.mm
-
-colnames(MMRFdataPrepro) <- substr(colnames(MMRFdataPrepro),1,9)
+                                            filename ="img/MMRF_Preprocessing.png",width = 900, height = 900)
 
 
 G_list<-rownames(MMRFdataPrepro)
@@ -73,7 +79,7 @@ row.names(MMRFdataPrepro)<-symbol.gene$SYMBOL
 G_list<-symbol.gene$SYMBOL
 
 # subset of genes list to make faster the run
-G_list<-G_list[1:200]
+G_list<-G_list[1:1000]
 
 
 
@@ -85,15 +91,15 @@ gr2<-dexa.samples[dexa.samples %in% colnames(MMRFdataPrepro)]
 
 dataMMcomplete <- log2(MMRFdataPrepro[1:56457,] + 1)
 
-tabSurvKM <- MMRFanalyzeGDC_SurvivalKM(clin.mm,
-                                       dataMMcomplete,
-                                       Genelist = G_list,
-                                       Survresult = TRUE,
-                                       p.cut = 0.05,
-                                       ThreshTop = 0.67,
-                                       ThreshDown = 0.33,
-                                       group1=gr1, 
-                                       group2=gr2)
+tabSurvKM <- TCGAanalyze_SurvivalKM(clin.mm,
+                                    dataMMcomplete,
+                                    Genelist = G_list,
+                                    Survresult = TRUE,
+                                    p.cut = 0.05,
+                                    ThreshTop = 0.67,
+                                    ThreshDown = 0.33,
+                                    group1=gr1, 
+                                    group2=gr2)
 
 
 
@@ -116,34 +122,37 @@ colnames(tabSurvKM) <- col.names
 
 datatable(tabSurvKM)
 
-#select the top two genes in tabSurvKM
+#For example we select the top two genes in tabSurvKM
 
 
 top.gene1<-rownames(tabSurvKM)[1]
 top.gene2<-rownames(tabSurvKM)[2]
 
 
-tabSurvKM.gene1 <- MMRFanalyzeGDC_SurvivalKM(clin.mm,
-                                       dataMMcomplete,
-                                       Genelist = top.gene1,
-                                       Survresult = TRUE,
-                                       p.cut = 0.05,
-                                       ThreshTop = 0.67,
-                                       ThreshDown = 0.33,
-                                       group1=gr1, 
-                                       group2=gr2)
+
+tabSurvKM.gene1 <- TCGAanalyze_SurvivalKM(clin.mm,
+                                          dataMMcomplete,
+                                          Genelist = top.gene1,
+                                          Survresult = TRUE,
+                                          p.cut = 0.05,
+                                          ThreshTop = 0.67,
+                                          ThreshDown = 0.33,
+                                          group1=gr1, 
+                                          group2=gr2)
 
 
 
-tabSurvKM.gene2 <- MMRFanalyzeGDC_SurvivalKM(clin.mm,
-                                             dataMMcomplete,
-                                             Genelist = top.gene2,
-                                             Survresult = TRUE,
-                                             p.cut = 0.05,
-                                             ThreshTop = 0.67,
-                                             ThreshDown = 0.33,
-                                             group1=gr1, 
-                                             group2=gr2)
+tabSurvKM.gene2 <- TCGAanalyze_SurvivalKM(clin.mm,
+                                          dataMMcomplete,
+                                          Genelist = top.gene2,
+                                          Survresult = TRUE,
+                                          p.cut = 0.05,
+                                          ThreshTop = 0.67,
+                                          ThreshDown = 0.33,
+                                          group1=gr1, 
+                                          group2=gr2)
+
+
 
 
 
