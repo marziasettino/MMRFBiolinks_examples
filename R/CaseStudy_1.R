@@ -6,8 +6,7 @@ library(MMRFBiolinks)
 library(EnsDb.Hsapiens.v79)
 
 #Get MMRF-COMMPASS Project Summary
-
-summary<-MMRFgetProjectSummary()
+summary<-MMRFprojectGDC_Summary()
 summary$data_categories
 summary$experimental_strategies
 
@@ -44,7 +43,7 @@ query.fpkm <- GDCquery(project = "MMRF-COMMPASS",
 
 
 
-summary<-MMRFqueryGDC_Summary(query.fpkm)
+summary.query<-MMRFqueryGDC_Summary(query.fpkm)
 
 
 
